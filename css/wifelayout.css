@@ -1,0 +1,32 @@
+.mainbody {
+    top: 114px;
+    left: 114px;
+    right: 114px;
+    bottom: 39px;
+    padding-right: 5px;
+}
+.footer {
+    bottom: 5px ;
+    left: 5px;
+    right: 5px;
+    height: 25px;
+    font-size: 8px;
+    text-align: center;
+    padding-top: 15px;
+}
+.header {
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    height: 100px;
+    z-index: 2;
+}
+.leftmenu {
+    top: 114px;
+    left: 5px;
+    width: 100px;
+    bottom: 39px;
+    z-index: 1;
+    padding-top: 40px;
+    border-right: solid 1px #555555 ;
+}

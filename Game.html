@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Memory Game</title>
+    <a href="index.html"> Back to Professional Page </a>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            color:black
+        }
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 10px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #4caf50;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+        }
+        .card.flipped {
+            background-color: #fff;
+            color: #333;
+            cursor: default;
+        }
+        .card .hidden-symbol {
+            visibility: hidden;
+        }
+        #reset-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #reset-button:hover {
+            background-color: #45a049;
+        }
+        #win-message {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mini Memory Game</h1>
+    <p>Match all the cards to win!</p>
+    <div class="game-container" id="game"></div>
+    <button id="reset-button">Restart Game</button>
+    <p id="win-message"></p>
+    <script>
+        // Initialize variables
+        const cardsArray = ["🍎", "🍎", "🍌", "🍌", "🍇", "🍇", "🍓", "🍓"];
+        let firstCard = null;
+        let secondCard = null;
+        let lockBoard = false;
+        let matchCount = 0;
+        let tries = 0;
+        const gameContainer = document.getElementById('game');
+        const resetButton = document.getElementById('reset-button');
+        const winMessage = document.getElementById('win-message');
+
+        // Shuffle cards
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        // Create cards
+        function createCards() {
+            gameContainer.innerHTML = ''; // Clear existing cards
+            winMessage.textContent = ''; // Clear win message
+            const shuffledCards = shuffle(cardsArray);
+            matchCount = 0;
+            tries = 0;
+
+            shuffledCards.forEach((symbol) => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.symbol = symbol;
+
+                const cardFace = document.createElement('span');
+                cardFace.classList.add('hidden-symbol');
+                cardFace.innerText = symbol;
+                card.appendChild(cardFace);
+
+                card.addEventListener('click', flipCard);
+                gameContainer.appendChild(card);
+            });
+        }
+
+        // Flip a card
+        function flipCard() {
+            if (lockBoard || this === firstCard || this.classList.contains('flipped')) return;
+
+            const hiddenSymbol = this.querySelector('.hidden-symbol');
+            hiddenSymbol.style.visibility = 'visible';
+            this.classList.add('flipped');
+
+            if (!firstCard) {
+                firstCard = this;
+            } else {
+                secondCard = this;
+                tries++;
+                checkMatch();
+            }
+        }
+
+        // Check if two cards match
+        function checkMatch() {
+            const isMatch = firstCard.dataset.symbol === secondCard.dataset.symbol;
+
+            if (isMatch) {
+                disableCards();
+            } else {
+                unflipCards();
+            }
+        }
+
+        // Disable matched cards
+        function disableCards() {
+            firstCard.removeEventListener('click', flipCard);
+            secondCard.removeEventListener('click', flipCard);
+            matchCount++;
+
+            if (matchCount === cardsArray.length / 2) {
+                displayWinMessage();
+            }
+
+            resetBoard();
+        }
+
+        // Unflip cards if they don't match
+        function unflipCards() {
+            lockBoard = true;
+
+            setTimeout(() => {
+                firstCard.querySelector('.hidden-symbol').style.visibility = 'hidden';
+                secondCard.querySelector('.hidden-symbol').style.visibility = 'hidden';
+
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+
+                resetBoard();
+            }, 1000);
+        }
+
+        // Reset board state
+        function resetBoard() {
+            [firstCard, secondCard, lockBoard] = [null, null, false];
+        }
+
+        // Display win message
+        function displayWinMessage() {
+            winMessage.textContent = `Congratulations! You won in ${tries} tries!`;
+        }
+
+        // Reset game
+        function resetGame() {
+            firstCard = null;
+            secondCard = null;
+            lockBoard = false;
+            createCards();
+        }
+
+        // Event listener for reset button
+        resetButton.addEventListener('click', resetGame);
+
+        // Start the game
+        createCards();
+    </script>
+</body>
+</html>
+
